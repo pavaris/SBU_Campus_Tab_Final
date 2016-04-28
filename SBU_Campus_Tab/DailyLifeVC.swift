@@ -31,15 +31,14 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
     var searchButt:UIButton!
     
     //  MARK:-  Variables
+    
     // Location data
     var locations = [CustomGMSMarker]() //original
-    var selectedLocations = [CustomGMSMarker]() // filtered
     var categories = [String]() // corresponding categories(not assigned='Default')
     var categorySet: Set<String> = []
     var selectedCategorySet: Set<String> = []
     
-    //  Searching Date
-    var filteredLocations = [CustomGMSMarker]()
+    //  Searching Data
     var locationTitles = [String]()
     var filteredTitles = [String]()
     
@@ -257,9 +256,6 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         }
     }
     
-    
-    
-    
     struct MyVariables {
         static var allNames: [String] = []
         static var allShortNames: [String] = []
@@ -272,20 +268,14 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         static var allSnippets: [String] = []
         static var hoursWeek: [String] = []
         static var hoursWeekend: [String] = []
-        
     }
     
     func returnName(index: Int){
         print(MyVariables.allNames[index])
     }
     
-    
-    
     func serverRequest(){
-        var lastModifiedLocal = NSDate()
-        
-        
-        
+        let lastModifiedLocal = NSDate()
         let requestURL: NSURL = NSURL(string: "http://130.245.191.166:8080/maps.php")!
         let urlRequest: NSMutableURLRequest = NSMutableURLRequest(URL: requestURL)
         let session = NSURLSession.sharedSession()
@@ -308,12 +298,10 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
                     let number = String(0)
                     print("somethingor",json[number])
                     
-                    
                     if let item = json[0] as? [String: AnyObject]{
                         MyVariables.lastModifiedServer = String(item["lastModified"])
                         print(MyVariables.lastModifiedServer)
                     }
-                    
                     
                     for i in 1...json.count-1{
                         let num = String(i)
@@ -353,14 +341,9 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
                             hoursWeek = hoursWeek.substringWithRange(Range<String.Index>(start: hoursWeek.startIndex.advancedBy(9), end: hoursWeek.endIndex.advancedBy(-1)))
                             print(hoursWeek)
                             
-                            
                             var hoursWeekend = String(item["hoursWeekend"])
                             hoursWeekend = hoursWeekend.substringWithRange(Range<String.Index>(start: hoursWeekend.startIndex.advancedBy(9), end: hoursWeekend.endIndex.advancedBy(-1)))
                             print(hoursWeekend)
-                            
-                            
-                            
-                            
                             
                             MyVariables.allNames.append(name)
                             MyVariables.allCoordX.append(coordX!)
@@ -398,17 +381,12 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
             self.loadMarkers(self.viewMap)
             self.getTitles()
             self.getCategories()
-            
         }
     }
-    
-    
-    
-    
+ 
     
     //  Load Markers
     private func loadMarkers(mapView: GMSMapView) {
-        
         
         //Saved locations
         NSUserDefaults.standardUserDefaults().setObject(MyVariables.allNames, forKey: "names")
@@ -455,8 +433,6 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         }
         print("AFTER", serverDate)
         
-        
-        
         if(MyVariables.jsonLength != 0){
             for i in 0...MyVariables.jsonLength-2{
                 let nameFor = String(names![i])
@@ -466,7 +442,6 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
                 let coordXFor = Double(String(coordX![i]))
                 let coordYFor = Double(String(coordY![i]))
                 let snippetsFor = String(snippets![i])
-                
                 
                 let tempvar = CustomGMSMarker()
                 tempvar.position = CLLocationCoordinate2DMake(coordXFor!,coordYFor!)
@@ -484,12 +459,10 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
             
             self.presentViewController(alertController, animated: true, completion: nil)
         }
-        
     }
     
     func mapView(mapView: GMSMapView, didTapInfoWindowOfMarker marker: GMSMarker) {
         print("You tapped at \(marker.title), \(marker.snippet)")
-        
         
         for x in 0...MyVariables.allNames.count-1{
             if(MyVariables.allNames[x] == marker.title){
@@ -508,12 +481,6 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
                 
             }
         }
-        
-        
-        
-        
-        
-        
     }
 }
 
