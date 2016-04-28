@@ -79,7 +79,8 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         for loc in locations {
             categories.append(loc.category)
             categorySet.insert(loc.category)
-            selectedCategorySet.insert(loc.category)
+            // Initially unselect all.
+            //selectedCategorySet.insert(loc.category)
         }
     }
     
@@ -90,6 +91,15 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         viewMap.myLocationEnabled = true
         viewMap.settings.myLocationButton = true
         viewMap.padding = UIEdgeInsetsMake(0, 0, bottomLayoutGuide.length + 60, 0)
+    }
+    
+    private func getMarker(title: String!) -> GMSMarker? {
+        for (var i=0;i<locations.count;i++) {
+            if (title == locations[i].title) {
+                return locations[i]
+            }
+        }
+        return nil
     }
     
     //  MARK: - Search
@@ -132,6 +142,7 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
     internal func searchBarCancelButtonClicked(searchBar: UISearchBar) {
         // called when cancel button pressed
         searchBar.placeholder?.removeAll()
+        searchBar.text?.removeAll()
         viewMap.clear()
         for loc in locations {
             loc.map = viewMap
@@ -167,6 +178,7 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
+    
     //  Data Source
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if searchBar.text == "" { print("locations \(locationTitles.count)")
@@ -175,6 +187,7 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
             return filteredTitles.count
         }
     }
+    
     //  Labels for cell.
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellIdentifier = "MyCell"
@@ -188,10 +201,16 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         
         return cell
     }
+    
     //  Selected cell.
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         NSLog("You selected cell number: \(indexPath.row)!")
-        let loc = locations[indexPath.row]
+        var loc: GMSMarker!
+        if searchBar.text == "" {
+            loc = locations[indexPath.row]
+        } else {
+            loc = getMarker(filteredTitles[indexPath.row])
+        }
         viewMap.clear()
         loc.map = viewMap
         let camera = GMSCameraPosition.cameraWithLatitude(loc.position.latitude,
@@ -289,19 +308,6 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
                     
                     
                     if let item = json[0] as? [String: AnyObject]{
-                        /*
-                        var lastModified = String(item["lastModified"])
-                        lastModified = lastModified.substringWithRange(Range<String.Index>(start: lastModified.startIndex.advancedBy(9), end: lastModified.endIndex.advancedBy(-15)))
-                        print("date ", lastModified)
-                        lastModified = lastModified + "EDT"
-                        print("date2 ", lastModified)
-                        
-                        let dateFormatter = NSDateFormatter()
-                        dateFormatter.dateFormat = "EEE MMM dd yyy HH:mm:ss zzz"
-                        let date = dateFormatter.dateFromString(lastModified)
-                        print("ios date", date)
-                        */
-                        
                         MyVariables.lastModifiedServer = String(item["lastModified"])
                         print(MyVariables.lastModifiedServer)
                     }
@@ -445,8 +451,7 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         else{
             print("DATES SAME")
         }
-        print("AFTER",
-            serverDate)
+        print("AFTER", serverDate)
         
         
         
@@ -466,7 +471,7 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
                 tempvar.title = nameFor
                 tempvar.snippet = snippetsFor
                 tempvar.category = categoryFor
-                tempvar.map = mapView
+                //tempvar.map = mapView
                 locations.append(tempvar)
             }
         }
