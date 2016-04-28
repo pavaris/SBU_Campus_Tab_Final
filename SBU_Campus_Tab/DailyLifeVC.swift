@@ -145,7 +145,9 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
         searchBar.text?.removeAll()
         viewMap.clear()
         for loc in locations {
-            loc.map = viewMap
+            if selectedCategorySet.contains(loc.category) {
+                loc.map = viewMap
+            }
         }
         configMap() // reset camera
         table.hidden = true
