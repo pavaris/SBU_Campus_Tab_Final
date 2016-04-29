@@ -117,6 +117,8 @@ class DailyLifeVC: UIViewController, UISearchBarDelegate, UITableViewDelegate, U
     
     internal func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
         // called when text starts editing
+        searchButt.hidden = true
+        categoryButton.hidden = true
         table.reloadData()
         print("Begin editing")
         searchBar.showsCancelButton = true
